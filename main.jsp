@@ -8,7 +8,7 @@
 <body>
 <div align=center>
 <h3> Dear
-<% String tempStr=request.getParameter("login"); %>
+<% String tempStr=(String)request.getAttribute("sendRealNameToJspPage"); %>
 <% if (tempStr!=null) out.print(tempStr); %>
 <% if (tempStr==null) out.print("Guest"); %>
 </h3>
