@@ -4,6 +4,10 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -17,6 +21,9 @@ import notepadMySqlQueries.MySqlQueries;
 @WebServlet("/AuthorizationServlet")
 public class AuthorizationServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
+	
+	private static ArrayList<String> userBox=new ArrayList<String>();
+	
 	private MySqlQueries mySqlQuery=null;
 
 	private String realName="";
@@ -33,7 +40,22 @@ public class AuthorizationServlet extends HttpServlet {
 		mySqlQuery = new MySqlQueries(mySqlConnectionForQuery);
 
 	}
+	
+	public static void setUserBox(String login, String realName){
+		userBox.add(0, login);
+		userBox.add(1, realName);		
+	}
+	
+	public static ArrayList<String> getUserBox(){
+		return userBox;
+	}
 
+	protected void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		setUserBox("","");
+		getServletContext().getRequestDispatcher("/authorization.html").forward(request, response);
+	}
+	
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		realName = (String) request.getParameter("realname");
@@ -48,6 +70,7 @@ public class AuthorizationServlet extends HttpServlet {
 		
 		if (login == "") {
 			System.out.println("Login is null. Please type login.");
+			request.setAttribute("warningText", "Login is null. Please type login.");
 			getServletContext().getRequestDispatcher("/warning.jsp").forward(request, response);
 		} else {
 			if (realName != "") {
@@ -56,10 +79,12 @@ public class AuthorizationServlet extends HttpServlet {
 				try {
 					if (result.first()) {
 						System.out.println("Such login already exists. Please type another login.");
+						request.setAttribute("warningText", "Such login already exists. Please type another login.");
 						getServletContext().getRequestDispatcher("/warning.jsp").forward(request, response);
 					} else {
 						System.out.println("Login is unique. Lets add new user to DB.");
 						addNewUserToDB(realName,login,password);
+						setUserBox(login,realName);
 						request.setAttribute("sendRealNameToJspPage", realName);
 						getServletContext().getRequestDispatcher("/main.jsp").forward(request, response);
 					}
@@ -73,12 +98,21 @@ public class AuthorizationServlet extends HttpServlet {
 				try {
 					if (!result.first()) {
 						System.out.println("Such login is missing in DB. Please type another login.");
+						request.setAttribute("warningText", "Such login is missing in DB. Please type another login.");
 						getServletContext().getRequestDispatcher("/warning.jsp").forward(request, response);
 					} else {
-						System.out.println("Login is found and unique.");
-						realName=result.getString("name");
-						request.setAttribute("sendRealNameToJspPage", realName);
-						getServletContext().getRequestDispatcher("/main.jsp").forward(request, response);
+						System.out.println("Login is found and unique. Lets check his password ...");
+						if(result.getString("pass").equals(password)){
+							System.out.println("Password is correct. Authentication is done.");
+							realName=result.getString("name");
+							setUserBox(login,realName);
+							request.setAttribute("sendRealNameToJspPage", realName);
+							getServletContext().getRequestDispatcher("/main.jsp").forward(request, response);
+						} else{
+							request.setAttribute("warningText", "The password is incorrect.");
+							getServletContext().getRequestDispatcher("/warning.jsp").forward(request, response);							
+						}
+
 					}
 				} catch (SQLException e) {
 					System.out.println("exception 2");

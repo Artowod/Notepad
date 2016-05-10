@@ -10,10 +10,8 @@
 <div align=center>
 <h1> Dear guest, you have typed incorrect credentials. Please try again.</h1>
 <br>
-<h3> Possible errors: 
-If you are the new user then Login you have entered is already exists in DB;
-If you are already registered in DB then Login you have entered is wrong;
-You forgot to put Login.</h3>
+<h3> Detected error: </h3>
+<% out.print(request.getAttribute("warningText")); %>
 </div>
 </body>
 </html>
