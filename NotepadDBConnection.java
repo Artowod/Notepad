@@ -6,10 +6,11 @@ import java.sql.SQLException;
 import java.util.Properties;
 
 public class NotepadDBConnection {
-	private String host;
-	private String root;
-	private String password;
-	private String nameDb;
+
+	private final String host="localhost:3306";
+	private final String root="root";
+	private final String password="Root1";
+	private final String nameDb="notepadusers";
 	private String url;
 	
 	protected Properties properties=new Properties();
@@ -19,11 +20,8 @@ public class NotepadDBConnection {
 		return mysqlConnection;
 	}
 	
-	public NotepadDBConnection(String host, String root, String password, String nameDb){
-		this.host=host;
-		this.root=root; //user
-		this.password=password;
-		this.nameDb=nameDb;
+	public NotepadDBConnection(){
+
 	}
 	
 	public void initializeProperties(){
@@ -43,10 +41,10 @@ public class NotepadDBConnection {
 				mysqlConnection=DriverManager.getConnection(url, properties);
 				//		mysqlConnect=DriverManager.getConnection(url, root, password);
 			} catch (SQLException e) {
-				System.out.println("exception 4");
+				System.out.println("SQL exception - establishDBConnection");
 				e.printStackTrace();
 			} catch (ClassNotFoundException e) {
-				System.out.println("exception 5");
+				System.out.println("ClassNotFound exception - establishDBConnection");
 				e.printStackTrace();
 			}
 			System.out.println("Connection to DataBase \""+nameDb+"\" has been successfully established." );
@@ -61,7 +59,7 @@ public class NotepadDBConnection {
 			System.out.println("+---------------------------------------------------------+");
 			System.out.println("DataBase \""+nameDb+"\" has been successfully disconnected." );		
 		} catch (SQLException e) {
-			System.out.println("exception 6");
+			System.out.println("SQL exception - closeDBConnection");
 			e.printStackTrace();
 		}
 	}

@@ -18,6 +18,7 @@ public class MySqlQueries {
 			stmt = mySqlConnection.createStatement();
 			stmt.executeUpdate(query);
 		} catch (SQLException e) {
+			System.out.println("SQL exception - withResultQuery");
 			e.printStackTrace();
 		}
 
@@ -30,13 +31,61 @@ public class MySqlQueries {
 			stmt = mySqlConnection.createStatement();
 			result=stmt.executeQuery(query);
 		} catch (SQLException e) {
+			System.out.println("SQL exception - ResultSet withResultQuery");
 			e.printStackTrace();
 		}
 		return result;
 	}
 	
+	public int getId_author(String loginFromUserBox){
+		int id_author=0;
+		String queryId_author="SELECT id_user FROM users WHERE login='"+loginFromUserBox+"'";
+		ResultSet fromUsersTable=withResultQuery(queryId_author);
+		try {
+			if(fromUsersTable.next()){
+				id_author=Integer.parseInt(fromUsersTable.getString("id_user"));
+			} else {
+				System.out.println("ResultSet is empty! <getId_author>");
+			}
+		} catch (SQLException e) {
+			System.out.println("SQL exception - getId_author");
+			e.printStackTrace();
+		}
+		return id_author;
+	}
+
+	public int getId_theme(String themeName){
+		int id_theme=0;
+		String queryId_theme="SELECT id_theme FROM themes WHERE themename='"+themeName+"'";
+		ResultSet fromThemesTable=withResultQuery(queryId_theme);
+		try {
+			if(fromThemesTable.next()){
+			id_theme=Integer.parseInt(fromThemesTable.getString("id_theme"));
+			} else {
+				System.out.println("ResultSet is empty! <getId_theme>");
+			}
+		} catch (SQLException e) {
+			System.out.println("SQL exception - getId_theme");
+			e.printStackTrace();
+		}
+		return id_theme;
+	}
+	
+	public void initialFillingOfThemesTableInDB(){
+		/* it`s never used in Java code. it was moved to Mysql  server for direct execution.*/
+
+		String addThemeToDB = "INSERT INTO themes (themename) VALUE ('IT sphere')";
+		withoutResultQuery(addThemeToDB);
+		addThemeToDB = "INSERT INTO themes (themename) VALUE ('Java programming')";
+		withoutResultQuery(addThemeToDB);
+		addThemeToDB = "INSERT INTO themes (themename) VALUE ('General info')";
+		withoutResultQuery(addThemeToDB);
+		addThemeToDB = "INSERT INTO themes (themename) VALUE ('English')";
+		withoutResultQuery(addThemeToDB);
+	}
+	
 	public void initialCreationOfTables(){
-	/* it`s not used in Java code. it was moved to Mysql  server for direct execution.*/
+	/* it`s never used in Java code. it was moved to Mysql  server for direct execution.*/
 	/* Tables:   */
 	/* Table 1 - users (id, login, name, pass) */
 	/* Table 2 - themes (id, themename) */
