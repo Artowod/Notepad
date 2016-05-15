@@ -5,10 +5,6 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -20,20 +16,16 @@ import notepadMySqlQueries.MySqlQueries;
 
 @WebServlet("/AuthorizationServlet")
 public class AuthorizationServlet extends HttpServlet {
-	private static final long serialVersionUID = 1L;
-	
+	private static final long serialVersionUID = 1L;	
 	private static ArrayList<String> userBox=new ArrayList<String>();
-	
 	private MySqlQueries mySqlQuery=null;
-
 	private String realName="";
 	private String login="";
 	private String password="";
 
 	public AuthorizationServlet() {	
-		System.out.println("Constructor!");
 		/* just once - prepare DBconnection for any query */
-		NotepadDBConnection connect=new NotepadDBConnection("localhost:3306","root","Root1","notepadusers");
+		NotepadDBConnection connect=new NotepadDBConnection();
 		connect.initializeProperties();
 		connect.establishDBConnection();
 		Connection mySqlConnectionForQuery = connect.getMySqlConnection();		
@@ -63,10 +55,10 @@ public class AuthorizationServlet extends HttpServlet {
 		password = (String) request.getParameter("password");
 		
 		
-		System.out.println("+---------------------------+");
-		System.out.println("Real Name: " + realName);
+		System.out.println("+-----------User-Authentication------------+");
+		System.out.println("Name : " + realName);
 		System.out.println("Login: " + login);
-		System.out.println("+---------------------------+");
+		System.out.println("+------------------------------------------+");
 		
 		if (login == "") {
 			System.out.println("Login is null. Please type login.");
@@ -89,7 +81,7 @@ public class AuthorizationServlet extends HttpServlet {
 						getServletContext().getRequestDispatcher("/main.jsp").forward(request, response);
 					}
 				} catch (SQLException e) {
-					System.out.println("exception 1");
+					System.out.println("SQL exception - AuthorizationServlet - if new user.");
 					e.printStackTrace();
 				}
 			} else {
@@ -115,45 +107,45 @@ public class AuthorizationServlet extends HttpServlet {
 
 					}
 				} catch (SQLException e) {
-					System.out.println("exception 2");
+					System.out.println("SQL exception - AuthorizationServlet - if user exists.");
 					e.printStackTrace();
 				}
 			}
 		}
 	}
 		
-	protected ResultSet checkUserInDB(String column, String value){	
-		
+	protected ResultSet checkUserInDB(String column, String value) {
 		/* ********************Query With Result***************** */
-		String withResultQuery="SELECT * FROM users WHERE "+column+"='"+value+"'";
+		String withResultQuery = "SELECT * FROM users WHERE " + column + "='" + value + "'";
 		ResultSet result = mySqlQuery.withResultQuery(withResultQuery);
 		/* ****************************************************** */
 		showResultSet(result);
 		return result;
 	}
 
-	private void showResultSet(ResultSet result){
+	private void showResultSet(ResultSet result) {
 		try {
-			while(result.next()){			
-			String resultToString_login=result.getString("login");
-			String resultToString_name=result.getString("name");			
-			System.out.println("ID / Name / Login");
-			System.out.println(result.getRow()+" / "+resultToString_login+" / "+resultToString_name);
+			while (result.next()) {
+				String resultToString_login = result.getString("login");
+				String resultToString_name = result.getString("name");
+				System.out.println("ID / Name / Login");
+				System.out.println(result.getRow() + " / " + resultToString_login + " / " + resultToString_name);
 			}
 		} catch (SQLException e) {
-			System.out.println("exception 3");
+			System.out.println("SQL exception - AuthorizationServlet - showResultSet");
 			e.printStackTrace();
 		}
 
 	}
 	
 	protected void addNewUserToDB(String newRealName, String newLogin, String newPassword){
-		String query="";
-
 		/* ********************Query Without Result************** */
-			query="INSERT INTO users (login, name, pass) VALUE ('"+newLogin+"','"+newRealName+"','"+newPassword+"')";
-			mySqlQuery.withoutResultQuery(query);
-		/* ****************************************************** */		
+		String query = "INSERT INTO users (login, name, pass) VALUE ('" 
+				+ newLogin + "','" 
+				+ newRealName + "','"
+				+ newPassword + "')";
+		mySqlQuery.withoutResultQuery(query);
+		/* ****************************************************** */
 	}
 
 }
